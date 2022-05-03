@@ -53,9 +53,7 @@ int main(int argc, char * argv[])
 
     try
     {
-        auto images = read_logo(args->input_filename);
-        for(std::size_t i = 0; i < std::size(images); ++i)
-            write_png(images[i], std::to_string(i) + ".png");
+        read_logo(args->input_filename);
     }
     catch(const std::runtime_error & e)
     {

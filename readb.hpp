@@ -40,10 +40,12 @@ inline std::vector<std::byte> read_file(const std::string & filename)
     std::vector<std::byte> data;
     std::array<std::byte, 4096> buffer;
 
-    while(file.read(reinterpret_cast<char *>(std::data(buffer)), std::size(buffer)))
+    do
     {
+        file.read(reinterpret_cast<char *>(std::data(buffer)), std::size(buffer));
         data.insert(std::end(data), std::begin(buffer), std::begin(buffer) + file.gcount());
-    }
+    } while(file);
+
     if(file.bad())
         throw std::runtime_error{"Could not open read region file: " + filename + ". " + std::strerror(errno)};
 
@@ -98,7 +100,7 @@ T bswap(T a)
 }
 
 template <typename T, Byte_iter InputIter> requires (!std::is_enum_v<T>)
-T readb_i(InputIter & begin, InputIter end, std::endian endian = std::endian::little)
+T readb(InputIter & begin, InputIter end, std::endian endian = std::endian::little)
 {
     T t;
     auto & buf = reinterpret_cast<std::byte(&)[sizeof(T)]>(t);
@@ -114,13 +116,13 @@ T readb_i(InputIter & begin, InputIter end, std::endian endian = std::endian::li
 }
 
 template<typename E, Byte_iter InputIter> requires std::is_enum_v<E>
-E readb_i(InputIter & begin, InputIter end, std::endian endian = std::endian::little)
+E readb(InputIter & begin, InputIter end, std::endian endian = std::endian::little)
 {
     return static_cast<E>(readb_i<std::underlying_type_t<E>>(begin, end, endian));
 }
 
 template <Byte_iter InputIter>
-std::string readstr_i(InputIter & begin, InputIter end, std::size_t len)
+std::string readstr(InputIter & begin, InputIter end, std::size_t len)
 {
     std::string s(len, '\0');
     for(std::size_t i = 0; i < len; ++i)
@@ -131,40 +133,5 @@ std::string readstr_i(InputIter & begin, InputIter end, std::size_t len)
     }
     return s;
 }
-
-template <typename T, Byte_iter InputIter> requires (!std::is_enum_v<T>)
-T readb(const InputIter & begin, InputIter end, std::endian endian = std::endian::little)
-{
-    auto begin_copy {begin};
-    return readb_i<T>(begin_copy, end, endian);
-}
-
-template<typename E, Byte_iter InputIter> requires std::is_enum_v<E>
-E readb(const InputIter & begin, InputIter end, std::endian endian = std::endian::little)
-{
-    auto begin_copy {begin};
-    return readb_i<E>(begin_copy, end, endian);
-}
-
-template <Byte_iter InputIter>
-std::string readstr(const InputIter & begin, InputIter end, std::size_t len)
-{
-    auto begin_copy {begin};
-    return readstr_i(begin_copy, end);
-}
-
-// TODO: replace w/ std::bit_width when clang gets around to it
-#ifdef __cpp_lib_bitops
-using std::bit_width;
-#else
-template<typename T> requires std::is_integral_v<T> && std::is_unsigned_v<T>
-constexpr T bit_width(T x)
-{
-    if(x == 0) return static_cast<T>(0);
-    T width = 1;
-    for(; x >>= 1; ++width);
-    return width;
-};
-#endif
 
 #endif // READB_HPP
