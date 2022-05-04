@@ -57,11 +57,7 @@ int main(int argc, char * argv[])
 
     try
     {
-        std::vector<Image> images;
-        for(auto & i: args->input_filenames)
-            images.emplace_back(read_png(i));
-
-        write_logo(images, args->output_filename);
+        write_logo(args->input_filenames, args->output_filename);
     }
     catch(const std::runtime_error & e)
     {

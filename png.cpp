@@ -38,6 +38,8 @@ Image read_png(const std::string & input_filename)
     if(!png_image_begin_read_from_file(png_img, input_filename.c_str()))
         throw std::runtime_error {"Error reading PNG: " + std::string{png_img->message}};
 
+    png_img->format = PNG_FORMAT_RGB;
+
     Image img{png_img->width, png_img->height};
     if(std::size(img.image_data) != PNG_IMAGE_SIZE(png_img.get()))
         throw std::runtime_error {"PNG size mismatched"};
