@@ -92,8 +92,6 @@ void read_logo(const std::string & input_filename)
 
     const auto num_images = (directory_size - magic_size - sizeof(directory_size)) / dir_entry_size;
 
-    std::vector<Image> images;
-
     for(auto i = 0u; i < num_images; ++i)
     {
         auto name = readstr(input, std::end(data), name_size);
@@ -105,7 +103,6 @@ void read_logo(const std::string & input_filename)
         if(offset < directory_size || offset + size > std::size(data))
             throw std::runtime_error{"Error reading " + name + " from " + input_filename + ": bad offset and size"};
 
-        // TODO: save the order in the name somehow?
         read_image_data(std::span{std::begin(data) + offset, std::begin(data) + offset + size}, name, input_filename);
     }
 }
@@ -241,7 +238,7 @@ void write_logo(const std::vector<std::string> & filenames, const std::string & 
 
         writestr(name, name_size, output);
         writeb(offset, output, std::endian::little);
-        writeb(static_cast<uint32_t>(std::size(image_data)), output, std::endian::little);
+        writeb(static_cast<std::uint32_t>(std::size(image_data)), output, std::endian::little);
 
         std::cout<<"Wrote "<<name<<'\n';
     }
