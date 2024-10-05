@@ -118,7 +118,7 @@ T bswap(T a)
 template <typename T, Byte_input_iter InputIter> requires (!std::is_enum_v<T>)
 T readb(InputIter & begin, InputIter end, std::endian endian = std::endian::little)
 {
-    T t;
+    T t{0};
     auto & buf = reinterpret_cast<std::byte(&)[sizeof(T)]>(t);
     for(auto && i: buf)
     {
@@ -134,7 +134,7 @@ T readb(InputIter & begin, InputIter end, std::endian endian = std::endian::litt
 template<typename E, Byte_input_iter InputIter> requires std::is_enum_v<E>
 E readb(InputIter & begin, InputIter end, std::endian endian = std::endian::little)
 {
-    return static_cast<E>(readb_i<std::underlying_type_t<E>>(begin, end, endian));
+    return static_cast<E>(readb<std::underlying_type_t<E>>(begin, end, endian));
 }
 
 template <Byte_input_iter InputIter>
