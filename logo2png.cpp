@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <cxxopts.hpp>
+#include "cxxopts_wrapper.hpp"
 
 #include "png.hpp"
 #include "logo.hpp"
@@ -38,7 +38,7 @@ std::optional<Args> get_args(int argc, char * argv[])
 
         return output_args;
     }
-    catch(const cxxopts::OptionException & e)
+    catch(const cxxopt_exception & e)
     {
         std::cerr<<options.help()<<'\n'<<e.what()<<'\n';
         return {};
